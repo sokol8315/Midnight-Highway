@@ -2,32 +2,28 @@ using UnityEngine;
 
 public class FallingObject : MonoBehaviour
 {
-    public float speed = 5f; // Швидкість падіння ями
+    public float speed = 5f;
 
     void Update()
     {
-        // Рухаємо яму вниз кожного кадру
-        transform.Translate(Vector3.down * speed * Time.deltaTime);
-        
-        // Якщо яма пролетіла повз екран (дуже низько), знищуємо її, щоб не засмічувати пам'ять
-        if (transform.position.y < -7f)
+        // Беремо точний множник з GameManager
+        float currentSpeed = speed * GameManager.instance.gameSpeedMultiplier;
+        transform.Translate(Vector3.down * currentSpeed * Time.deltaTime);
+
+        // Якщо яма пролетіла екран — даємо очки і знищуємо її
+        if (transform.position.y < -6f) 
         {
+            GameManager.instance.AddScore(10);
             Destroy(gameObject);
         }
     }
 
-    // Ця функція спрацьовує, коли яма торкається машини
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Перевіряємо, чи врізалися ми саме в гравця (синій квадрат)
+        // Якщо врізалися в гравця
         if (collision.CompareTag("Player"))
         {
-            Debug.Log("💥 БАМ! Ти врізався в яму!");
-            
-            // Звертаємося до нашого Менеджера і кажемо відняти життя
             GameManager.instance.LoseLife();
-            
-            // Знищуємо яму
             Destroy(gameObject); 
         }
     }
